@@ -1,0 +1,51 @@
+! global debug = false
+
+
+> object recordid python
+    import utills
+
+    name = ""
+    for i in range(1, len(args)):
+      if i == 1:
+        name += args[i]
+      else:
+        name += " " + args[i]
+    success = utills.recordAttendance(name,str(args[0]))
+    if success:
+        return "true"
+    else:
+        return "false"
+< object
+
+
+> begin
+
+  + request
+  * <get start> == undefined => <set start=true>{topic=start}{ok}
+  - {ok}
+
+< begin
+
+> topic start
+
+  + *
+  - Hi! I'm your attendance chatbot!.\s
+  ^ I am here to take your attendance.\n
+  ^ What is your name?{topic=asked_name}
+
+< topic
+
+> topic asked_name
+  + *
+  - <set name=<formal>>Nice to meet you, <get name>! Please, tell me your ID{topic=asked_id}
+< topic
+
+> topic asked_id
+  + *
+  * <call>recordid <star1> <get name></call> == true => You're all set! your attendance has been taken.
+  - There is a problem registering you.
+
+  + [*](main|menu)[*]{weight=3}
+  - {topic=start}{@start}
+
+< topic
